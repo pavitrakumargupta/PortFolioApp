@@ -1,21 +1,41 @@
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
 import { FiGithub, FiLinkedin, FiMail, FiFileText, FiArrowUp } from 'react-icons/fi'
 import { profileData } from '../data/profile'
 import './Footer.css'
 
 const Footer = () => {
+  const ref = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
+  const isInView = useInView(ref, { once: true, amount: 0.1, margin: "-100px" })
+  
+  // On mobile, show immediately; on desktop, use scroll animation
+  const shouldAnimate = !isMobile && isInView
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
-    <footer className="footer">
+    <footer className="footer" ref={ref}>
       <div className="footer-container">
         <motion.div
           className="footer-content"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          animate={shouldAnimate || isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.6 }}
         >
           <div className="footer-info">
@@ -90,3 +110,7 @@ const Footer = () => {
 }
 
 export default Footer
+
+
+
+

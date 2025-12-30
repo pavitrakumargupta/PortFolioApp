@@ -111,3 +111,6 @@ skills: {
 All your data is in: `src/data/profile.js`
 
 That's it! Update one file, and your entire portfolio updates automatically! 🚀
+
+
+

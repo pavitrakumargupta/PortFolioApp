@@ -1,16 +1,33 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { FiGithub, FiExternalLink, FiCode, FiSmartphone, FiPlay, FiX } from 'react-icons/fi'
 import { profileData } from '../data/profile'
 import './Projects.css'
 
 const Projects = () => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
+  const isInView = useInView(ref, { once: true, amount: 0.1, margin: "-100px" })
   const [playingVideo, setPlayingVideo] = useState(null)
   const videoRefs = useRef({})
   const [imageErrors, setImageErrors] = useState({})
+  
+  // On mobile, show immediately; on desktop, use scroll animation
+  const shouldAnimate = !isMobile && isInView
 
   const projects = profileData.projects
 
@@ -103,8 +120,8 @@ const Projects = () => {
       <motion.div
         className="projects-container"
         variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        initial={isMobile ? "visible" : "hidden"}
+        animate={shouldAnimate || isMobile ? "visible" : "hidden"}
       >
         <motion.div className="section-header" variants={itemVariants}>
           <h2 className="section-title">Projects</h2>
@@ -297,3 +314,7 @@ const Projects = () => {
 }
 
 export default Projects
+
+
+
+

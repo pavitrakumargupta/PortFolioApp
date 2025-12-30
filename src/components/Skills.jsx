@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { 
   SiReact, SiJavascript, SiTypescript, SiNodedotjs, SiPython,
   SiHtml5, SiCss3, SiMongodb, SiPostgresql, SiDocker,
@@ -65,7 +65,24 @@ const iconMap = {
 
 const Skills = () => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
+  const isInView = useInView(ref, { once: true, amount: 0.1, margin: "-100px" })
+  
+  // On mobile, show immediately; on desktop, use scroll animation
+  const shouldAnimate = !isMobile && isInView
 
   const skillCategories = profileData.skills.categories.map(category => ({
     ...category,
@@ -102,8 +119,8 @@ const Skills = () => {
       <motion.div
         className="skills-container"
         variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        initial={isMobile ? "visible" : "hidden"}
+        animate={shouldAnimate || isMobile ? "visible" : "hidden"}
       >
         <motion.div className="section-header" variants={itemVariants}>
           <h2 className="section-title">Skills</h2>
@@ -139,8 +156,8 @@ const Skills = () => {
                       <div className="skill-bar">
                         <motion.div
                           className="skill-progress"
-                          initial={{ width: 0 }}
-                          animate={isInView ? { width: `${skill.level}%` } : { width: 0 }}
+                          initial={{ width: isMobile ? `${skill.level}%` : 0 }}
+                          animate={(shouldAnimate || isMobile) ? { width: `${skill.level}%` } : { width: 0 }}
                           transition={{ duration: 1, delay: skillIndex * 0.1 }}
                         />
                       </div>
