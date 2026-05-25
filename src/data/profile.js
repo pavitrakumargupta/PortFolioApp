@@ -594,9 +594,10 @@ export const profileData = {
 
       github: null,
       live: null,
-      image: null,
-      video: null,
+      image: "https://drive.google.com/file/d/1gKPNgNfafMG7pMzXOtHBgkF01kzQjswo/view?usp=sharing",
+      video: "https://drive.google.com/file/d/1z4N8OMECxldFJHVqKO3Qcy5tzrn93MPK/view?usp=drive_link",
       mobile: null,
+
 
       featured: true
     },
@@ -644,7 +645,6 @@ export const profileData = {
 
       featured: true
     },
-
     {
       title: "AI Email Automation System",
 
@@ -682,8 +682,8 @@ export const profileData = {
 
       github: null,
       live: null,
-      image: null,
-      video: null,
+      image: "https://drive.google.com/file/d/1K7mnlarVPhzWt5FiBC5_tb16-ldabh2R/view?usp=sharing",
+      video: "https://drive.google.com/file/d/1k_zV9hbBIm6CgLYzEZ6etCS1lbiV-W5M/view?usp=drive_link",
       mobile: null,
 
       featured: true
