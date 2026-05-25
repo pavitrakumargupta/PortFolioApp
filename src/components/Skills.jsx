@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
-import { useRef, useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { 
   SiReact, SiJavascript, SiTypescript, SiNodedotjs, SiPython,
   SiHtml5, SiCss3, SiMongodb, SiPostgresql, SiDocker,
   SiGit, SiGithub, SiExpress, SiNextdotjs,
   SiVuedotjs, SiTailwindcss, SiBootstrap, SiRedux,
   SiNestjs, SiFirebase, SiVercel,
-  SiNetlify, SiTensorflow, SiGoogle, SiSequelize
+  SiNetlify, SiTensorflow, SiGoogle, SiSequelize, SiAmazon
 } from 'react-icons/si'
 import { 
   FaMicrophone, FaImage, FaCloud, FaPlug, FaCode,
@@ -48,48 +48,39 @@ const iconMap = {
   // Cloud & DevOps
   "Git": <SiGit />,
   "GitHub": <SiGithub />,
-  // "AWS (S3, ECS)": <SiAmazonaws />,
-  // "AWS": <SiAmazonaws />,
+  "AWS (S3, ECS)": <SiAmazon />,
+  "AWS": <SiAmazon />,
   "Render": <FaCloud />,
   "Vercel": <SiVercel />,
   "Netlify": <SiNetlify />,
   
   // AI & Automation
   "Whisper (Speech-to-Text)": <FaMicrophone />,
+  "Whisper": <FaMicrophone />,
   "Coqui TTS": <FaMicrophone />,
+  "Gemini API": <FaRobot />,
+  "OCR Pipelines": <FaImage />,
+  "AI Workflow Automation": <FaRobot />,
   "Stable Diffusion": <FaImage />,
   "ComfyUI": <FaImage />,
   "TensorFlow": <SiTensorflow />,
+  "TensorFlow Lite": <SiTensorflow />,
   "Google Apps Script": <SiGoogle />
 }
 
 const Skills = () => {
   const ref = useRef(null)
-  const [isMobile, setIsMobile] = useState(false)
-  
-  // Detect mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      setIsMobile(isMobileDevice)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-  
-  const isInView = useInView(ref, { once: true, amount: 0.1, margin: "-100px" })
-  
-  // On mobile, show immediately; on desktop, use scroll animation
-  const shouldAnimate = !isMobile && isInView
+  const isInView = useInView(ref, { once: true, amount: 0.2 })
 
   const skillCategories = profileData.skills.categories.map(category => ({
     ...category,
-    skills: category.skills.map(skill => ({
-      ...skill,
-      icon: iconMap[skill.name] || <SiReact />
-    }))
+    skills: category.skills.map(skill => {
+      const skillName = typeof skill === 'string' ? skill : skill.name
+      return {
+        name: skillName,
+        icon: iconMap[skillName] || <FaCode />
+      }
+    })
   }))
 
   const containerVariants = {
@@ -119,8 +110,8 @@ const Skills = () => {
       <motion.div
         className="skills-container"
         variants={containerVariants}
-        initial={isMobile ? "visible" : "hidden"}
-        animate={shouldAnimate || isMobile ? "visible" : "hidden"}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
       >
         <motion.div className="section-header" variants={itemVariants}>
           <h2 className="section-title">Skills</h2>
@@ -151,15 +142,6 @@ const Skills = () => {
                     <div className="skill-info">
                       <div className="skill-header">
                         <span className="skill-name">{skill.name}</span>
-                        <span className="skill-level">{skill.level}%</span>
-                      </div>
-                      <div className="skill-bar">
-                        <motion.div
-                          className="skill-progress"
-                          initial={{ width: isMobile ? `${skill.level}%` : 0 }}
-                          animate={(shouldAnimate || isMobile) ? { width: `${skill.level}%` } : { width: 0 }}
-                          transition={{ duration: 1, delay: skillIndex * 0.1 }}
-                        />
                       </div>
                     </div>
                   </motion.div>

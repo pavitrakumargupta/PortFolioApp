@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { FiGithub, FiExternalLink, FiCode, FiSmartphone, FiPlay, FiX } from 'react-icons/fi'
-import { profileData } from '../data/profile'
+import { profileData, projectTabs } from '../data/profile'
 import './Projects.css'
 
 const Projects = () => {
@@ -22,19 +22,24 @@ const Projects = () => {
   }, [])
   
   const isInView = useInView(ref, { once: true, amount: 0.1, margin: "-100px" })
-  const [playingVideo, setPlayingVideo] = useState(null)
-  const videoRefs = useRef({})
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [isModalVideoPlaying, setIsModalVideoPlaying] = useState(false)
   const [imageErrors, setImageErrors] = useState({})
+  const [activeTab, setActiveTab] = useState(projectTabs[0] || 'All')
   
   // On mobile, show immediately; on desktop, use scroll animation
   const shouldAnimate = !isMobile && isInView
 
   const projects = profileData.projects
+  const filteredProjects =
+    activeTab === 'All'
+      ? projects
+      : projects.filter((project) => project.categories?.includes(activeTab))
 
   // Handle image load errors
-  const handleImageError = (index, imageUrl) => {
-    setImageErrors(prev => ({ ...prev, [index]: true }))
-    console.warn(`Failed to load image for project ${index}:`, imageUrl)
+  const handleImageError = (projectKey, imageUrl) => {
+    setImageErrors(prev => ({ ...prev, [projectKey]: true }))
+    console.warn(`Failed to load image for project ${projectKey}:`, imageUrl)
   }
 
   // Helper function to convert Google Drive link to embed URL
@@ -93,6 +98,39 @@ const Projects = () => {
     return imageUrl && (imageUrl.includes('drive.google.com') || imageUrl.includes('googleusercontent.com'))
   }
 
+  const hasImageAsset = (imageUrl) => {
+    return !!(imageUrl && (imageUrl.startsWith('/') || imageUrl.startsWith('./') || imageUrl.startsWith('http') || imageUrl.includes('.')))
+  }
+
+  const openProjectModal = (project) => {
+    setSelectedProject(project)
+    setIsModalVideoPlaying(false)
+  }
+
+  const closeProjectModal = () => {
+    setSelectedProject(null)
+    setIsModalVideoPlaying(false)
+  }
+
+  useEffect(() => {
+    if (!selectedProject) return undefined
+
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        closeProjectModal()
+      }
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleEsc)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleEsc)
+    }
+  }, [selectedProject])
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -131,165 +169,54 @@ const Projects = () => {
           </p>
         </motion.div>
 
-        <div className="projects-grid">
-          {projects.map((project, index) => (
+        <motion.div className="project-tabs" variants={itemVariants}>
+          {projectTabs.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`project-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="projects-grid"
+          key={activeTab}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {filteredProjects.map((project, index) => {
+            const projectKey = project.title || index
+            return (
             <motion.div
-              key={index}
+              key={projectKey}
               className={`project-card ${project.featured ? 'featured' : ''}`}
               variants={itemVariants}
               whileHover={{ y: -10, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
+              onClick={() => openProjectModal(project)}
             >
               <div className="project-image">
-                {project.video ? (
-                  <div className="project-video-container">
-                    {isGoogleDrive(project.video) ? (
-                      <>
-                        <iframe
-                          src={playingVideo === index ? getVideoUrl(project.video) : undefined}
-                          className="project-video-iframe"
-                          allow="autoplay; encrypted-media"
-                          allowFullScreen
-                          style={{ display: playingVideo === index ? 'block' : 'none' }}
-                        />
-                        {playingVideo !== index && (
-                          <>
-                            {project.image && (project.image.startsWith('/') || project.image.startsWith('./') || project.image.startsWith('http') || project.image.includes('.')) ? (
-                              !imageErrors[index] ? (
-                                <img 
-                                  src={isGoogleDriveImage(project.image) ? getImageUrl(project.image) : project.image} 
-                                  alt={project.title}
-                                  className="project-video-poster"
-                                  onError={() => handleImageError(index, project.image)}
-                                />
-                              ) : (
-                                <div className="project-video-placeholder">
-                                  <span className="project-emoji">{project.image || '🎥'}</span>
-                                </div>
-                              )
-                            ) : (
-                              <div className="project-video-placeholder">
-                                <span className="project-emoji">{project.image || '🎥'}</span>
-                              </div>
-                            )}
-                            <div className="video-play-overlay" onClick={() => setPlayingVideo(index)}>
-                              <motion.div
-                                className="play-button"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                              >
-                                <FiPlay size={48} />
-                              </motion.div>
-                            </div>
-                          </>
-                        )}
-                        {playingVideo === index && (
-                          <button
-                            className="video-close-button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setPlayingVideo(null)
-                            }}
-                            title="Close Video"
-                          >
-                            <FiX size={20} />
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <video
-                          ref={(el) => videoRefs.current[index] = el}
-                          src={project.video}
-                          className="project-video"
-                          controls={playingVideo === index}
-                          poster={project.image && (project.image.startsWith('/') || project.image.startsWith('./') || project.image.startsWith('http') || project.image.includes('.')) ? (isGoogleDriveImage(project.image) ? getImageUrl(project.image) : project.image) : undefined}
-                          onPlay={() => setPlayingVideo(index)}
-                          onPause={() => {
-                            if (videoRefs.current[index]?.paused) {
-                              setPlayingVideo(null)
-                            }
-                          }}
-                          onEnded={() => setPlayingVideo(null)}
-                        >
-                          Your browser does not support the video tag.
-                        </video>
-                        {playingVideo !== index && (
-                          <div className="video-play-overlay" onClick={() => {
-                            setPlayingVideo(index)
-                            setTimeout(() => {
-                              videoRefs.current[index]?.play()
-                            }, 100)
-                          }}>
-                            <motion.div
-                              className="play-button"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <FiPlay size={48} />
-                            </motion.div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className={`project-image-placeholder ${project.image && (project.image.startsWith('/') || project.image.startsWith('./') || project.image.startsWith('http') || project.image.includes('.')) ? 'has-image' : ''}`}>
-                    {project.image && (project.image.startsWith('/') || project.image.startsWith('./') || project.image.startsWith('http') || project.image.includes('.')) ? (
-                      !imageErrors[index] ? (
-                        <img 
-                          src={isGoogleDriveImage(project.image) ? getImageUrl(project.image) : project.image} 
-                          alt={project.title}
-                          className="project-img"
-                          onError={() => handleImageError(index, project.image)}
-                        />
-                      ) : (
-                        <span className="project-emoji">{project.image || '📁'}</span>
-                      )
-                    ) : (
-                      <span className="project-emoji">{project.image || '📁'}</span>
-                    )}
-                  </div>
-                )}
-                <div className="project-overlay">
-                  {project.github && (
-                    <motion.a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="project-link"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      title="GitHub"
-                    >
-                      <FiGithub size={24} />
-                    </motion.a>
+                <div className={`project-image-placeholder ${hasImageAsset(project.image) ? 'has-image' : ''}`}>
+                  {hasImageAsset(project.image) && !imageErrors[projectKey] ? (
+                    <img
+                      src={isGoogleDriveImage(project.image) ? getImageUrl(project.image) : project.image}
+                      alt={project.title}
+                      className="project-img"
+                      onError={() => handleImageError(projectKey, project.image)}
+                    />
+                  ) : (
+                    <span className="project-emoji">{project.image || '📁'}</span>
                   )}
-                  {project.live && (
-                    <motion.a
-                      href={project.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="project-link"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      title="Live Demo"
-                    >
-                      <FiExternalLink size={24} />
-                    </motion.a>
-                  )}
-                  {project.mobile && (
-                    <motion.a
-                      href={project.mobile}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="project-link"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      title="Mobile App"
-                    >
-                      <FiSmartphone size={24} />
-                    </motion.a>
+                  {project.video && (
+                    <div className="preview-video-badge">
+                      <FiPlay size={14} />
+                      Video
+                    </div>
                   )}
                 </div>
               </div>
@@ -298,17 +225,144 @@ const Projects = () => {
                   <FiCode className="project-icon" />
                   <h3 className="project-title">{project.title}</h3>
                 </div>
-                <p className="project-description">{project.description}</p>
+                {project.status && (
+                  <div className="project-status">{project.status}</div>
+                )}
+                {project.badges?.length > 0 && (
+                  <div className="project-badges">
+                    {project.badges.slice(0, 3).map((badge, i) => (
+                      <span key={i} className="project-badge">{badge}</span>
+                    ))}
+                  </div>
+                )}
+                <p className="project-description project-description-preview">{project.description}</p>
+              </div>
+            </motion.div>
+          )})}
+        </motion.div>
+      </motion.div>
+
+      {selectedProject && (
+        <div className="project-modal-backdrop" onClick={closeProjectModal}>
+          <motion.div
+            className="project-modal"
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="project-modal-close"
+              onClick={closeProjectModal}
+              title="Close"
+            >
+              <FiX size={20} />
+            </button>
+
+            <div className="project-modal-media">
+              {selectedProject.video && isModalVideoPlaying ? (
+                isGoogleDrive(selectedProject.video) ? (
+                  <iframe
+                    src={getVideoUrl(selectedProject.video)}
+                    className="project-modal-video-iframe"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={selectedProject.video}
+                    className="project-modal-video"
+                    controls
+                    autoPlay
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )
+              ) : (
+                <div className={`project-modal-image-wrap ${hasImageAsset(selectedProject.image) ? 'has-image' : ''}`}>
+                  {hasImageAsset(selectedProject.image) && !imageErrors[selectedProject.title] ? (
+                    <img
+                      src={isGoogleDriveImage(selectedProject.image) ? getImageUrl(selectedProject.image) : selectedProject.image}
+                      alt={selectedProject.title}
+                      className="project-modal-image"
+                      onError={() => handleImageError(selectedProject.title, selectedProject.image)}
+                    />
+                  ) : (
+                    <span className="project-emoji">{selectedProject.image || '📁'}</span>
+                  )}
+
+                  {selectedProject.video && (
+                    <button
+                      type="button"
+                      className="project-modal-play-button"
+                      onClick={() => setIsModalVideoPlaying(true)}
+                    >
+                      <FiPlay size={20} />
+                      Play Project Video
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="project-modal-content">
+              <h3 className="project-modal-title">{selectedProject.title}</h3>
+
+              {selectedProject.status && (
+                <div className="project-status">{selectedProject.status}</div>
+              )}
+
+              {selectedProject.badges?.length > 0 && (
+                <div className="project-badges">
+                  {selectedProject.badges.map((badge, i) => (
+                    <span key={i} className="project-badge">{badge}</span>
+                  ))}
+                </div>
+              )}
+
+              <p className="project-description">{selectedProject.description}</p>
+
+              {selectedProject.categories?.length > 0 && (
+                <div className="project-categories">
+                  {selectedProject.categories.map((category, i) => (
+                    <span key={i} className="category-tag">{category}</span>
+                  ))}
+                </div>
+              )}
+
+              {selectedProject.technologies?.length > 0 && (
                 <div className="project-tech">
-                  {project.technologies.map((tech, i) => (
+                  {selectedProject.technologies.map((tech, i) => (
                     <span key={i} className="tech-tag">{tech}</span>
                   ))}
                 </div>
+              )}
+
+              <div className="project-modal-links">
+                {selectedProject.github && (
+                  <a href={selectedProject.github} target="_blank" rel="noopener noreferrer" className="project-modal-link">
+                    <FiGithub size={18} />
+                    GitHub
+                  </a>
+                )}
+                {selectedProject.live && (
+                  <a href={selectedProject.live} target="_blank" rel="noopener noreferrer" className="project-modal-link">
+                    <FiExternalLink size={18} />
+                    Live Link
+                  </a>
+                )}
+                {selectedProject.mobile && (
+                  <a href={selectedProject.mobile} target="_blank" rel="noopener noreferrer" className="project-modal-link">
+                    <FiSmartphone size={18} />
+                    App Link
+                  </a>
+                )}
               </div>
-            </motion.div>
-          ))}
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+      )}
     </section>
   )
 }
