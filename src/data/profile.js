@@ -415,53 +415,8 @@ export const profileData = {
 
       featured: true
     },
-    // ============================================
-    // ADD THESE NEW PROJECTS INSIDE projects ARRAY
-    // ============================================
 
-    {
-      title: "Unispade – Brand & Agency Collaboration Platform",
 
-      categories: [
-        "Enterprise",
-        "Web Apps"
-      ],
-
-      badges: [
-        "Enterprise",
-        "Collaboration Platform",
-        "Production"
-      ],
-
-      description:
-        "Built a large-scale collaboration platform enabling brands and agencies to connect, collaborate, and manage projects efficiently. The platform helps brands discover suitable agencies based on case studies, previous experiences, ratings, and domain expertise. Also developed a mentor discovery ecosystem allowing users to connect with highly rated mentors for business and technical guidance through affordable consultation systems.",
-
-      features: [
-        "Agency Discovery System",
-        "Case Study Showcase",
-        "Mentor Discovery Platform",
-        "Ratings & Review System",
-        "Project Collaboration Workflows",
-        "User Management System",
-        "Real-Time Platform Interactions"
-      ],
-
-      technologies: [
-        "React.js",
-        "Node.js",
-        "MongoDB",
-        "REST APIs",
-        "Real-Time Systems"
-      ],
-
-      github: null,
-      live: null,
-      image: null,
-      video: null,
-      mobile: null,
-
-      featured: true
-    },
 
     {
       title: "ShipSeva – Logistics & Delivery Management Platform",
@@ -479,7 +434,7 @@ export const profileData = {
       ],
 
       description:
-        "Currently building a B2B and B2C logistics and parcel delivery management platform enabling collaboration between multiple delivery partners. The system supports rate calculation, order tracking, wallet systems, query resolution workflows, and centralized shipment management for scalable logistics operations.",
+        "Built and developed a scalable B2B & B2C logistics and parcel delivery management platform enabling seamless collaboration between multiple delivery partners. Implemented core backend functionalities including shipment management, rate calculation, real-time order tracking, wallet systems, query resolution workflows, authentication, and centralized logistics operations. Focused on building secure APIs, scalable architecture, database management, and production-ready deployment infrastructure for high-volume logistics processing.",
 
       features: [
         "Multi-Partner Logistics Management",
@@ -502,8 +457,8 @@ export const profileData = {
       ],
 
       github: null,
-      live: null,
-      image: null,
+      live: "https://shipseva.com/",
+      image: "https://drive.google.com/file/d/1y2RCCC3Gp8mrCCwF0OOVaXCnvlX7Uvx2/view?usp=sharing",
       video: null,
       mobile: null,
 
@@ -548,14 +503,58 @@ export const profileData = {
       ],
 
       github: null,
-      live: null,
-      image: null,
+      live: "https://nvg.co.in/",
+      image: "https://drive.google.com/file/d/1NLqvnXkAT2gpgzCynRmAVMpP3VCRmV53/view?usp=sharing",
       video: null,
       mobile: null,
 
       featured: true,
 
       status: "In Progress"
+    },
+
+    {
+      title: "Unispade – Brand & Agency Collaboration Platform",
+
+      categories: [
+        "Enterprise",
+        "Web Apps"
+      ],
+
+      badges: [
+        "Enterprise",
+        "Collaboration Platform",
+        "Production"
+      ],
+
+      description:
+        "Built a large-scale collaboration platform enabling brands and agencies to connect, collaborate, and manage projects efficiently. The platform helps brands discover suitable agencies based on case studies, previous experiences, ratings, and domain expertise. Also developed a mentor discovery ecosystem allowing users to connect with highly rated mentors for business and technical guidance through affordable consultation systems.",
+
+      features: [
+        "Agency Discovery System",
+        "Case Study Showcase",
+        "Mentor Discovery Platform",
+        "Ratings & Review System",
+        "Project Collaboration Workflows",
+        "User Management System",
+        "Real-Time Platform Interactions"
+      ],
+
+      technologies: [
+        "React.js",
+        "Node.js",
+        "MongoDB",
+        "REST APIs",
+        "Real-Time Systems"
+      ],
+
+      github: null,
+      live: null,
+      image: null,
+      video: null,
+      mobile: null,
+
+      featured: true
     },
 
     {
