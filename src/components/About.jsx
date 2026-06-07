@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { FiCode, FiDatabase, FiCloud, FiSmartphone, FiServer } from 'react-icons/fi'
+import { FiCode, FiDatabase, FiCloud, FiSmartphone, FiServer, FiCpu } from 'react-icons/fi'
 import { FaRobot } from 'react-icons/fa'
 import { profileData } from '../data/profile'
 import './About.css'
 
 const iconMap = {
   code: <FiCode />,
+  cpu: <FiCpu />,
   server: <FiServer />,
   database: <FiDatabase />,
   bot: <FaRobot />,

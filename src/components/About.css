@@ -12,18 +12,18 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .title-underline {
-  width: 100px;
+  width: 64px;
   height: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-brand);
   margin: 0 auto 1.5rem;
-  border-radius: 2px;
+  border-radius: 999px;
 }
 
 .section-subtitle {
@@ -42,28 +42,35 @@
 }
 
 .service-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 2.5rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.2rem;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  cursor: default;
 }
 
 .service-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(102, 126, 234, 0.5);
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+  background: var(--bg-elevated-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow);
 }
 
 .service-icon {
-  font-size: 3rem;
-  color: #667eea;
-  margin-bottom: 1.5rem;
+  font-size: 1.7rem;
+  color: #fff;
+  margin-bottom: 1.4rem;
+  width: 56px;
+  height: 56px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  border-radius: 16px;
+  background: var(--gradient-brand);
+  box-shadow: 0 10px 26px rgba(129, 140, 248, 0.35);
 }
 
 .service-title {
@@ -96,7 +103,7 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   color: #ffffff;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
